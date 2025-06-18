@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :tunez, Tunez.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "elixir",
+  password: "elixir",
   hostname: "localhost",
   database: "tunez_dev",
   stacktrace: true,
