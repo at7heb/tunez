@@ -12,3 +12,17 @@ Once you have those installed:
 * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+
+## Debugging
+
+``` zsh
+to get to the database, use this command: "psql -U elixir -d postgres"
+\l to list databases
+\c <database>
+\dt to list relations/tables
+drop table first_table;
+drop table second_table;
+```
+
+if you drop the schema_migrations and other tables,
+you can request the migrations again
