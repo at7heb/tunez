@@ -26,3 +26,5 @@ drop table second_table;
 
 if you drop the schema_migrations and other tables,
 you can request the migrations again
+what does "mix ash.reset" do?
+what does "mix ash.setup" do?
