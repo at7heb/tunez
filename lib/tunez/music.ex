@@ -3,6 +3,12 @@ defmodule Tunez.Music do
     otp_app: :tunez
 
   resources do
-    resource Tunez.Music.Artist
+    resource Tunez.Music.Artist do
+      define :create_artist, action: :create
+      define :read_artists, action: :read
+      define :update_artist, action: :update
+      define :delete_artist, action: :destroy
+      define :get_artist_by_id, action: :read, get_by: :id
+    end
   end
 end

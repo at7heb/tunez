@@ -12,17 +12,12 @@ defmodule TunezWeb.Artists.IndexLive do
   end
 
   def handle_params(_params, _url, socket) do
-    artists = [
-      %{id: "test-artist-1", name: "Test Artist 1"},
-      %{id: "test-artist-2", name: "Test Artist 2"},
-      %{id: "test-artist-3", name: "Test Artist 3"}
-    ]
+    artists =
+      Tunez.Music.read_artists!()
 
-    socket =
-      socket
-      |> assign(:artists, artists)
+    n_socket = assign(socket, :artists, artists)
 
-    {:noreply, socket}
+    {:noreply, n_socket}
   end
 
   def render(assigns) do
