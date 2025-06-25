@@ -11,5 +11,7 @@ defmodule Tunez.Music do
       define :delete_artist, action: :destroy
       define :get_artist_by_id, action: :read, get_by: :id
     end
+
+    resource Tunez.Music.Album
   end
 end

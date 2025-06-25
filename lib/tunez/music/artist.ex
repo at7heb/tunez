@@ -6,6 +6,21 @@ defmodule Tunez.Music.Artist do
     repo Tunez.Repo
   end
 
+  actions do
+    defaults [:create, :read, :destroy, :update]
+    default_accept [:name, :biography]
+    # create :create do
+    #   accept [:name, :biography]
+    # end
+
+    # read :read do
+    #   primary? true
+    # end
+    # update :update do
+    #   accept [:name, :biography]
+    # end
+  end
+
   attributes do
     uuid_primary_key :id
 
@@ -20,18 +35,7 @@ defmodule Tunez.Music.Artist do
     update_timestamp :updated_at
   end
 
-  actions do
-    defaults [:create, :read, :destroy, :update]
-    default_accept [:name, :biography]
-    # create :create do
-    #   accept [:name, :biography]
-    # end
-
-    # read :read do
-    #   primary? true
-    # end
-    # update :update do
-    #   accept [:name, :biography]
-    # end
+  relationships do
+    has_many :albums, Tunez.Music.Album
   end
 end
