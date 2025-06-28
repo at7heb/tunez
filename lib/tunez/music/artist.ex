@@ -9,16 +9,6 @@ defmodule Tunez.Music.Artist do
   actions do
     defaults [:create, :read, :destroy, :update]
     default_accept [:name, :biography]
-    # create :create do
-    #   accept [:name, :biography]
-    # end
-
-    # read :read do
-    #   primary? true
-    # end
-    # update :update do
-    #   accept [:name, :biography]
-    # end
   end
 
   attributes do
@@ -36,6 +26,8 @@ defmodule Tunez.Music.Artist do
   end
 
   relationships do
-    has_many :albums, Tunez.Music.Album
+    has_many :albums, Tunez.Music.Album do
+      sort year_released: :desc
+    end
   end
 end
