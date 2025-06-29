@@ -25,6 +25,10 @@ defmodule TunezWeb.Artists.ShowLive do
         <.h1>
           {@artist.name}
         </.h1>
+        <.h2>
+          Previous Names:<p />
+          {@artist.previous_names}
+        </.h2>
         <:action>
           <.button_link
             kind="error"
