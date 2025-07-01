@@ -12,13 +12,18 @@ defmodule TunezWeb.Artists.IndexLive do
   end
 
   def handle_params(params, _url, socket) do
+    sort_by = Map.get(params, "sort_by", "name") |> validate_sort_by()
     query_text = Map.get(params, "q", "")
-    artists = Tunez.Music.search_artists!(query_text)
+    page_params = AshPhoenix.LiveView.page_from_params(params, 4)
+
+    page =
+      Tunez.Music.search_artists!(query_text, page: page_params, query: [sort_input: sort_by])
 
     socket =
       socket
       |> assign(:query_text, query_text)
-      |> assign(:artists, artists)
+      |> assign(:page, page)
+      |> assign(:sort_by, sort_by)
 
     {:noreply, socket}
   end
@@ -28,6 +33,7 @@ defmodule TunezWeb.Artists.IndexLive do
     <Layouts.app {assigns}>
       <.header responsive={false}>
         <.h1>Artists</.h1>
+        <:action><.sort_changer selected={@sort_by} /></:action>
         <:action>
           <.search_box query={@query_text} method="get" data-role="artist-search" phx-submit="search" />
         </:action>
@@ -38,16 +44,17 @@ defmodule TunezWeb.Artists.IndexLive do
         </:action>
       </.header>
 
-      <div :if={@artists == []} class="p-8 text-center">
+      <div :if={@page.results == []} class="p-8 text-center">
         <.icon name="hero-face-frown" class="w-32 h-32 bg-gray-300" />
         <br /> No artist data to display!
       </div>
 
       <ul class="gap-6 lg:gap-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-        <li :for={artist <- @artists}>
+        <li :for={artist <- @page.results}>
           <.artist_card artist={artist} />
         </li>
       </ul>
+      <.pagination_links page={@page} query_text={@query_text} sort_by={@sort_by} />
     </Layouts.app>
     """
   end
@@ -102,11 +109,26 @@ defmodule TunezWeb.Artists.IndexLive do
 
   def pagination_links(assigns) do
     ~H"""
-    <div class="flex justify-center pt-8 space-x-4">
-      <.button_link data-role="previous-page" kind="primary" inverse>
+    <div
+      :if={AshPhoenix.LiveView.prev_page?(@page) || AshPhoenix.LiveView.next_page?(@page)}
+      class="flex justify-center pt-8 space-x-4"
+    >
+      <.button_link
+        data-role="previous-page"
+        kind="primary"
+        inverse
+        patch={~p"/?#{query_string(@page, @query_text, @sort_by, "prev")}"}
+        disabled={!AshPhoenix.LiveView.prev_page?(@page)}
+      >
         « Previous
       </.button_link>
-      <.button_link data-role="next-page" kind="primary" inverse>
+      <.button_link
+        data-role="next-page"
+        kind="primary"
+        inverse
+        patch={~p"/?#{query_string(@page, @query_text, @sort_by, "next")}"}
+        disabled={!AshPhoenix.LiveView.next_page?(@page)}
+      >
         Next »
       </.button_link>
     </div>
@@ -154,8 +176,8 @@ defmodule TunezWeb.Artists.IndexLive do
 
   defp sort_options do
     [
-      {"recently updated", "updated_at"},
-      {"recently added", "inserted_at"},
+      {"recently updated", "-updated_at"},
+      {"recently added", "-inserted_at"},
       {"name", "name"}
     ]
   end
@@ -180,7 +202,7 @@ defmodule TunezWeb.Artists.IndexLive do
   end
 
   def handle_event("search", %{"query" => query}, socket) do
-    params = remove_empty(%{q: query})
+    params = remove_empty(%{q: query, sort_by: socket.assigns.sort_by})
     {:noreply, push_patch(socket, to: ~p"/?#{params}")}
   end
 
@@ -190,5 +212,15 @@ defmodule TunezWeb.Artists.IndexLive do
       n when n >= 1_000 -> "#{Float.round(n / 1_000, 1)}K"
       n -> n
     end
+  end
+
+  def query_string(page, query_text, sort_by, direction) do
+    case AshPhoenix.LiveView.page_link_params(page, direction) do
+      :invalid -> []
+      list -> list
+    end
+    |> Keyword.put(:q, query_text)
+    |> Keyword.put(:sort_by, sort_by)
+    |> remove_empty()
   end
 end
