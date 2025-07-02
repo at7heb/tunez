@@ -62,6 +62,12 @@ defmodule Tunez.Music.Album do
     end
   end
 
+  calculations do
+    calculate :years_ago, :integer, expr(2025 - year_released) do
+      description "Calculates how many years ago the album was released"
+    end
+  end
+
   identities do
     identity :unique_albums_for_each_artist,
              [:name, :artist_id],
