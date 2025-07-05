@@ -1,5 +1,13 @@
 defmodule Tunez.Music.Album do
-  use Ash.Resource, otp_app: :tunez, domain: Tunez.Music, data_layer: AshPostgres.DataLayer
+  use Ash.Resource,
+    otp_app: :tunez,
+    domain: Tunez.Music,
+    data_layer: AshPostgres.DataLayer,
+    extensions: [AshJsonApi.Resource]
+
+  json_api do
+    type "album"
+  end
 
   postgres do
     table "albums"
@@ -8,6 +16,10 @@ defmodule Tunez.Music.Album do
     references do
       reference :artist, index?: true, on_delete: :delete
     end
+  end
+
+  resource do
+    description "A group of at least two tracks associated with an artist."
   end
 
   actions do
@@ -40,16 +52,18 @@ defmodule Tunez.Music.Album do
 
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
 
     attribute :year_released, :integer do
       allow_nil? false
-      # constraints min: 1900, max: 2100
+      public? true
     end
 
     attribute :cover_image_url, :string do
       allow_nil? true
       constraints max_length: 2048
+      public? true
     end
 
     create_timestamp :inserted_at
@@ -65,16 +79,17 @@ defmodule Tunez.Music.Album do
   calculations do
     calculate :years_ago, :integer, expr(2025 - year_released) do
       description "Calculates how many years ago the album was released"
+      public? true
     end
+  end
+
+  def next_year do
+    Date.utc_today().year + 1
   end
 
   identities do
     identity :unique_albums_for_each_artist,
              [:name, :artist_id],
              message: "An album with this name already exists for this artist"
-  end
-
-  def next_year do
-    Date.utc_today().year + 1
   end
 end

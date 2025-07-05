@@ -7,6 +7,8 @@ defmodule Tunez.Music.Artist do
 
   json_api do
     type "artist"
+    includes [:albums]
+    derive_filter? false
   end
 
   postgres do
@@ -18,11 +20,20 @@ defmodule Tunez.Music.Artist do
     end
   end
 
+  resource do
+    description "
+    A person or group that creates music.
+    Artists can have multiple albums, and their name can change over time.
+    The `previous_names` attribute records all the names the artist has had.
+    "
+  end
+
   actions do
     defaults [:create, :read, :destroy]
     default_accept [:name, :biography]
 
     update :update do
+      description "Updates an Artist's name and biography, and records the previous names."
       accept [:name, :biography]
       require_atomic? false
 
@@ -34,10 +45,12 @@ defmodule Tunez.Music.Artist do
       argument :query, :ci_string do
         constraints allow_empty?: true
         default ""
+        description "Returns only Artists whose names contain this query string"
       end
 
       filter expr(contains(name, ^arg(:query)))
       pagination offset?: true, default_limit: 8
+      description "Lists Artists, optionally allowing a search for Artists by name"
     end
   end
 
@@ -48,10 +61,12 @@ defmodule Tunez.Music.Artist do
       allow_nil? false
       constraints min_length: 1, max_length: 255
       public? true
+      description "The name of the artist, which can be a person or a group."
     end
 
     attribute :biography, :string do
       public? true
+      description ""
     end
 
     attribute :previous_names, {:array, :string} do
@@ -66,6 +81,7 @@ defmodule Tunez.Music.Artist do
   relationships do
     has_many :albums, Tunez.Music.Album do
       sort year_released: :desc
+      public? true
     end
   end
 
