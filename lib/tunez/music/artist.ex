@@ -3,7 +3,11 @@ defmodule Tunez.Music.Artist do
     otp_app: :tunez,
     domain: Tunez.Music,
     data_layer: AshPostgres.DataLayer,
-    extensions: [AshJsonApi.Resource]
+    extensions: [AshGraphql.Resource, AshJsonApi.Resource]
+
+  graphql do
+    type :artist
+  end
 
   json_api do
     type "artist"
@@ -22,10 +26,10 @@ defmodule Tunez.Music.Artist do
 
   resource do
     description "
-    A person or group that creates music.
-    Artists can have multiple albums, and their name can change over time.
-    The `previous_names` attribute records all the names the artist has had.
-    "
+      A person or group that creates music.
+      Artists can have multiple albums, and their name can change over time.
+      The `previous_names` attribute records all the names the artist has had.
+      "
   end
 
   actions do
