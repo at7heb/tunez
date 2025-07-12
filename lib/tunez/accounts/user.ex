@@ -278,6 +278,16 @@ defmodule Tunez.Accounts.User do
     end
   end
 
+  policies do
+    bypass AshAuthentication.Checks.AshAuthenticationInteraction do
+      authorize_if always()
+    end
+
+    policy action([:register_with_password, :sign_in_with_password]) do
+      authorize_if always()
+    end
+  end
+
   attributes do
     uuid_primary_key :id
 
