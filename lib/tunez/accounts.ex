@@ -1,5 +1,11 @@
 defmodule Tunez.Accounts do
-  use Ash.Domain, otp_app: :tunez, extensions: [AshGraphql.Domain, AshJsonApi.Domain]
+  use Ash.Domain,
+    otp_app: :tunez,
+    extensions: [AshAdmin.Domain, AshGraphql.Domain, AshJsonApi.Domain]
+
+  admin do
+    show? true
+  end
 
   graphql do
     mutations do
